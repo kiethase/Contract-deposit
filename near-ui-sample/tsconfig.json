@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "strict": true,
+        "alwaysStrict": true,
+        "strictNullChecks": true,
+        "noUnusedLocals": false,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "react-jsx",
+        "downlevelIteration": true,
+        "allowSyntheticDefaultImports": true,
+        "types": ["jest"],
+        "baseUrl": "src"
+    },
+    "exclude": ["node_modules", "cypress"],
+    "include": ["./src/**/*.ts", "./src/**/*.tsx", "src/components/Confetti/index.js", "src/services/config.js", "src/services/near.js", "src/index.jsx", "src/services/near.js", "src/components/AccountDetails/index.jsx", "src/components/Buttons/index.jsx", "src/pages/Swap/index.jsx", "src/pages/App.jsx", "src/components/Sidebar/index.jsx", "src/components/Menu/index.jsx", "src/components/Logo/index.jsx", "src/components/Header/index.jsx", "src/components/DarkMode/index.jsx"]
+}
+  

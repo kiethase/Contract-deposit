@@ -41,7 +41,7 @@ export async function initContract() {
     nearTokenConfig.contractName,
     {
       viewMethods: ["ft_total_supply", "ft_balance_of"],
-      changeMethods: ["ft_transfer", "ft_transfer_call"],
+      changeMethods: ["ft_transfer", "ft_transfer_call","storage_deposit"],
     }
   );
 }
@@ -70,5 +70,5 @@ export const executeMultipleTransactions = async (transaction) => {
       });
     })
   );
-  // return window.walletConnection.requestSignTransaction(nearTransactions);
+  return window.walletConnection.requestSignTransaction(nearTransactions);
 };

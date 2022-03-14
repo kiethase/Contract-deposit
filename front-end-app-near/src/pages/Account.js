@@ -63,7 +63,7 @@ const AccountPage = () => {
         balanceWallet: balanceOfTokenInWallet,
       };
       for (let i2 in deposit_values) {
-        if (i == i2) {
+        if (i === i2) {
           console.log(i);
           obj.balanceInContract = deposit_values[i];
         }
@@ -126,7 +126,7 @@ const AccountPage = () => {
               </StyledTableCell>
 
               <StyledTableCell align="center">
-                {item.balanceInContract ? item.balanceInContract * 10 ** -8 : 0}
+                {item.balanceInContract ? item.balanceInContract * 10 ** -8 : "Not Register!"}
               </StyledTableCell>
 
               <StyledTableCell align="center">

@@ -62,7 +62,7 @@ export function getConfig(env) {
 // Hard code Contract Token
 
 
-export const CONTRACT_TOKEN = 'kietsub1.kietne.testnet';
+export const CONTRACT_TOKEN = 'eth.fakes.testnet';
 
 export function getConfigToken(env) {
   switch (env) {

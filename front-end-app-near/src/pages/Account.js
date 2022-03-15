@@ -16,8 +16,9 @@ const AccountPage = () => {
   const [result, setResult] = React.useState([]);
   const contract = window.contract;
   const accountId = window.accountId;
-  const config = getConfig("testnet");
+  const tokenContract = window.tokenContract;
 
+  const config = getConfig("testnet");
   // Dialog control
   const [itemDeposit, setItemDeposit] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -29,15 +30,44 @@ const AccountPage = () => {
   const handleClose = () => {
     setOpenDialog(false);
   };
+
+  //Register
+  const registerAccountToToken = async () => {
+    await tokenContract.storage_deposit(
+      {
+        account_id:  config.contractName,
+      },
+      "300000000000000",
+      "12500000000000000000000",
+     
+    );
+  
+  };
+
+  const handleRegisterExToToken = async (id) => {
+    let transactions = [];
+
+    transactions.unshift({
+      receiverId: id,
+      functionCalls: [
+        {
+          methodName: "storage_deposit",
+          args: {
+            account_id: config.contractName,
+          },
+          amount: "1",
+          gas: "100000000000000",
+        },
+      ],
+    });
+    await registerAccountToToken();
+  };
+
   // "ft_balance_of"
   const getBalanceOf = async () => {
     let obj = {};
     // Đây chúng ta lấy dữ liệu deposit gồm tokenID và amount
     let deposit_values = await contract.get_deposits({ account_id: accountId });
-
-    let whiteListToken = await window.walletConnection.account().viewFunction;
-
-    console.log(whiteListToken);
 
     const tokens = await fetch(
       `${config.helperUrl}/account/${accountId}/likelyTokens`
@@ -45,7 +75,6 @@ const AccountPage = () => {
       .then((response) => response.json())
       .then((tokens) => tokens);
 
-      console.log("ABC: ", deposit_values);
     for (let i of tokens) {
       let balanceOfTokenInWallet = await window.walletConnection
         .account()
@@ -62,22 +91,31 @@ const AccountPage = () => {
         .account()
         .viewFunction(i, "ft_metadata");
 
+      let storageBalanceOfGet = await window.walletConnection
+        .account()
+        .viewFunction(i, "storage_balance_of", {
+          account_id: config.contractName,
+        });
+
+      console.log(storageBalanceOfGet);
       obj = {
         id: i,
         name: metadataToken.name,
         balanceWallet: balanceOfTokenInWallet,
+        decimals: metadataToken.decimals,
       };
+      if (storageBalanceOfGet !== null) {
+        obj.checkRegister = true;
+      }
       for (let i2 in deposit_values) {
         if (i === i2) {
           obj.balanceInContract = deposit_values[i];
         }
       }
+
       setResult((data) => [...data, obj]);
     }
   };
-
-
-  
 
   React.useEffect(() => {
     getBalanceOf();
@@ -114,6 +152,7 @@ const AccountPage = () => {
             <StyledTableCell>Token ID</StyledTableCell>
             <StyledTableCell align="center">Amount in wallet</StyledTableCell>
             <StyledTableCell align="center">Amount in exchange</StyledTableCell>
+            <StyledTableCell align="center">Decimal</StyledTableCell>
             <StyledTableCell align="center">--</StyledTableCell>
           </TableRow>
         </TableHead>
@@ -126,21 +165,36 @@ const AccountPage = () => {
               <StyledTableCell>{item.name}</StyledTableCell>
               <StyledTableCell>{item.id}</StyledTableCell>
               <StyledTableCell align="center">
-                {item.balanceWallet * 10 ** -8}
+                {item.balanceWallet  * (10 ** -item.decimals) }
               </StyledTableCell>
 
               <StyledTableCell align="center">
-                {item.balanceInContract ? item.balanceInContract * 10 ** -8 : "Not Register!"}
+                {item.balanceInContract
+                  ? item.balanceInContract * (10 ** -item.decimals)
+                  : "Not Register!"}
               </StyledTableCell>
-
               <StyledTableCell align="center">
-                <Button
-                  variant="contained"
-                  sx={{ bgcolor: "#287FD1" }}
-                  onClick={() => handleOpen(item)}
-                >
-                  Deposit
-                </Button>
+                {item.decimals}
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                {!("checkRegister" in item) ? (
+                  <Button
+                    variant="contained"
+                    sx={{ bgcolor: "#1EAC4D" }}
+                    onClick={() => handleRegisterExToToken(item.id)}
+                  >
+                    Register
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    sx={{ bgcolor: "#287FD1" }}
+                    onClick={() => handleOpen(item)}
+                  >
+                    Deposit
+                  </Button>
+                )}
+                &nbsp;
               </StyledTableCell>
             </StyledTableRow>
           ))}

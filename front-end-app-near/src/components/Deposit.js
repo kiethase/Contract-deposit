@@ -29,7 +29,7 @@ const DepositComponent = (props) => {
     .object({
       amount: yup
         .number()
-        .min(1, "Số lượng đặt phải lớn hơn 0")
+        .min(0, "Số lượng đặt phải lớn hơn 0")
         .typeError("Số lượng phải lớn hơn 0")
         .required("Số lượng đặt mua"),
     })
@@ -54,7 +54,7 @@ const DepositComponent = (props) => {
     await tokenContract.ft_transfer_call(
       {
         receiver_id: config.contractName,
-        amount: `${amountDeposit}00000000`,
+        amount: (amountDeposit* 10 ** decimals).toString(),
         msg: "",
       },
       "300000000000000",
@@ -121,7 +121,7 @@ const DepositComponent = (props) => {
         <DialogTitle>DEPOSIT TOKEN "{item.name}"</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Balance: {item.balanceWallet * 10 ** -8}
+            Balance: {item.balanceWallet * (10 ** -item.decimals)}
           </DialogContentText>
           <TextField
             autoFocus

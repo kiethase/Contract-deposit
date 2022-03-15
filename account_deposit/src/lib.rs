@@ -88,6 +88,10 @@ impl Contract{
             HashMap::new()
         }
     }
+    pub fn get_whitelisted_tokens(&self) -> Vec<AccountId> {
+        self.whitelistied_tokens.to_vec()
+    }
+
 }
 
 impl Contract{

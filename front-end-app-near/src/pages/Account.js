@@ -34,13 +34,18 @@ const AccountPage = () => {
     let obj = {};
     // Đây chúng ta lấy dữ liệu deposit gồm tokenID và amount
     let deposit_values = await contract.get_deposits({ account_id: accountId });
+
+    let whiteListToken = await window.walletConnection.account().viewFunction;
+
+    console.log(whiteListToken);
+
     const tokens = await fetch(
       `${config.helperUrl}/account/${accountId}/likelyTokens`
     )
       .then((response) => response.json())
       .then((tokens) => tokens);
 
-    //   console.log(tokens);
+      console.log("ABC: ", deposit_values);
     for (let i of tokens) {
       let balanceOfTokenInWallet = await window.walletConnection
         .account()
@@ -64,7 +69,6 @@ const AccountPage = () => {
       };
       for (let i2 in deposit_values) {
         if (i === i2) {
-          console.log(i);
           obj.balanceInContract = deposit_values[i];
         }
       }

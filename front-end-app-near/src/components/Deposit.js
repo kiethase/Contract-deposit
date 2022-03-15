@@ -10,12 +10,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { getConfig } from "../services/config";
 
-
-
 const DepositComponent = (props) => {
   const { item } = props;
   const config = getConfig("testnet");
+  // console.log(config.contractName);
   const tokenContract = window.tokenContract;
+  const contract = window.contract;
 
   // const configContract = "kei13.testnet";
   // const ONE_YOCTO_NEAR = "0.000000000000000000000001";
@@ -45,24 +45,8 @@ const DepositComponent = (props) => {
 
   const submitForm = (data) => {
     // console.log(data.amount);
-    // let transactions = [];
     depositToken(data.amount, item.name, item.balanceInContract);
-    // if (!('balanceInContract' in item)) {
-    //   transactions.unshift({
-    //     receiverId: item.id,
-    //     functionCalls: [
-    //       {
-    //         methodName: "storage_deposit",
-    //         args: {
-    //           account_id: config.contractName,
-    //         },
-    //         amount: "0.0125",
-    //         gas: "100000000000000",
-    //       },
-    //     ],
-    //   });
-    //   // registerAccountToToken();
-    // }
+    // registerAccountToToken();
   };
 
   // Thực hiện hàm ft_transfer_call
@@ -78,19 +62,41 @@ const DepositComponent = (props) => {
     );
   };
 
-  const registerAccountToToken = async () => {
-      await tokenContract.storage_deposit(
-        {
-          account_id: config.contractName,
-        },
-        '0.0125',
-        '300000000000000'
-      )
-  }
+
+  /// REGISTER
+  const registerAccountToToken = async (id) => {
+    await tokenContract.storage_deposit(
+      {
+        account_id:  config.contractName,
+      },
+      "300000000000000",
+      "12500000000000000000000",
+     
+    );
+  
+  };
 
   const depositToken = async (amount, id, checkingRegisterBalance) => {
     let transactions = [];
     console.log("Data: ", amount, id, checkingRegisterBalance);
+  
+    // if (!("balanceInContract" in item)) {
+    //   transactions.unshift({
+    //     receiverId: id,
+    //     functionCalls: [
+    //       {
+    //         methodName: "storage_deposit",
+    //         args: {
+    //           account_id: config.contractName,
+    //         },
+    //         amount: "1",
+    //         gas: "100000000000000",
+           
+    //       },
+    //     ],
+    //   });
+    //  await registerAccountToToken(id);
+    // }
     transactions.unshift({
       receiverId: id,
       functionCalls: [
@@ -106,28 +112,7 @@ const DepositComponent = (props) => {
         },
       ],
     });
-
-    console.log(checkingRegisterBalance);
-    if (!('balanceInContract' in item)) {
-     
-      transactions.unshift({
-        receiverId: id,
-        functionCalls: [
-          {
-            methodName: "storage_deposit",
-            args: {
-              account_id: config.contractName,
-            },
-            amount: "0.0125",
-            gas: "100000000000000",
-          },
-        ],
-      });
-      console.log(transactions);
-      registerAccountToToken();
-    }
-    ftTransferCall(amount);
-
+    await ftTransferCall(amount);
   };
 
   return (

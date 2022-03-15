@@ -29,7 +29,7 @@ export async function initContract() {
     nearConfig.contractName,
     {
       // View methods are read only. They don't modify the state, but usually return some value.
-      viewMethods: ["get_deposits"],
+      viewMethods: ["get_deposits","get_whitelisted_tokens"],
       // Change methods can modify the state. But you don't receive the returned value when called.
       changeMethods: ["new", "create_new_pool", "add_liquidity"],
     }
@@ -47,28 +47,28 @@ export async function initContract() {
 }
 
 // export gas and amount for transaction
-export const getGas = (gas) => Buffer.from(new BN("100000000000000"));
+// export const getGas = (gas) => Buffer.from(new BN("100000000000000"));
 
-export const getAmount = (amount) =>
-  amount ? Buffer.from(new BN("100000000000000")) : Buffer.from(new BN("0"));
+// export const getAmount = (amount) =>
+//   amount ? Buffer.from(new BN("100000000000000")) : Buffer.from(new BN("0"));
 
-// Thực  hiện  multipleTransaction  cho  token
-export const executeMultipleTransactions = async (transaction) => {
-  const nearTransactions = await Promise.all(
-    transaction.map((t, i) => {
-      return createTransaction({
-        receiverId: t.receiverId,
-        nonce: i + 1,
-        actions: t.functionCalls.map((fc) =>
-          functionCall(
-            fc.methodName,
-            fc.args,
-            getGas(fc.gas),
-            getAmount(fc.amount)
-          )
-        ),
-      });
-    })
-  );
-  return window.walletConnection.requestSignTransaction(nearTransactions);
-};
+// // Thực  hiện  multipleTransaction  cho  token
+// export const executeMultipleTransactions = async (transaction) => {
+//   const nearTransactions = await Promise.all(
+//     transaction.map((t, i) => {
+//       return createTransaction({
+//         receiverId: t.receiverId,
+//         nonce: i + 1,
+//         actions: t.functionCalls.map((fc) =>
+//           functionCall(
+//             fc.methodName,
+//             fc.args,
+//             getGas(fc.gas),
+//             getAmount(fc.amount)
+//           )
+//         ),
+//       });
+//     })
+//   );
+//   return window.walletConnection.requestSignTransaction(nearTransactions);
+// };

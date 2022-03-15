@@ -6,6 +6,7 @@ import AuthContextProvider from "./context/authContext";
 import {initContract} from "./services/near";
 import { Buffer } from 'buffer'
 
+
 window.Buffer = window.Buffer || Buffer
 
 

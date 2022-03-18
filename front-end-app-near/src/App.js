@@ -3,6 +3,7 @@ import HomePage from "./pages/Home";
 import AccountPage from "./pages/Account";
 import styled from 'styled-components'
 import Header from "./components/Header/Header";
+import * as React from "react";
 
 
 
@@ -34,15 +35,16 @@ const BodyWrapper = styled.div`
 
 
 function App() {
+  const [loginState, setLoginState] = React.useState( window.walletConnection.isSignedIn());
   return (
     <AppWrapper>
       <HeaderWrapper>
-        <Header/>
+        <Header setLoginState={setLoginState}/>
       </HeaderWrapper>
       <BodyWrapper>
         <Routes>
-          <Route exact path="/account" element={<AccountPage/>}/>
-          <Route exact path="/" element={<HomePage/>}/>
+          <Route exact path="/account" element={<AccountPage loginState={loginState}/>}/>
+          <Route exact path="/" element={<HomePage loginState={loginState}/>}/>
         </Routes>
       </BodyWrapper>
     </AppWrapper>

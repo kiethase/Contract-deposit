@@ -11,9 +11,13 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Deposit from "../components/Deposit";
 import { getConfig } from "../services/config";
+import { useStateValue } from "../common/StateProvider";
+
 
 const AccountPage = () => {
   const [result, setResult] = React.useState([]);
+  // const [{ loading }, dispatch] = useStateValue();
+
   const contract = window.contract;
   const accountId = window.accountId;
   const tokenContract = window.tokenContract;
@@ -65,10 +69,11 @@ const AccountPage = () => {
 
   // "ft_balance_of"
   const getBalanceOf = async () => {
+    setResult([]);
     let obj = {};
     // Đây chúng ta lấy dữ liệu deposit gồm tokenID và amount
     let deposit_values = await contract.get_deposits({ account_id: accountId });
-
+    console.log(deposit_values);
     const tokens = await fetch(
       `${config.helperUrl}/account/${accountId}/likelyTokens`
     )
@@ -97,7 +102,6 @@ const AccountPage = () => {
           account_id: config.contractName,
         });
 
-      console.log(storageBalanceOfGet);
       obj = {
         id: i,
         name: metadataToken.name,
@@ -117,11 +121,10 @@ const AccountPage = () => {
     }
   };
 
-  React.useEffect(() => {
-    getBalanceOf();
+  React.useEffect(async() => {
+    await getBalanceOf();
   }, []);
 
-  console.log(result);
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: "#287FD1",
@@ -171,13 +174,13 @@ const AccountPage = () => {
               <StyledTableCell align="center">
                 {item.balanceInContract
                   ? item.balanceInContract * (10 ** -item.decimals)
-                  : "Not Register!"}
+                  : 0}
               </StyledTableCell>
               <StyledTableCell align="center">
                 {item.decimals}
               </StyledTableCell>
               <StyledTableCell align="center">
-                {!("checkRegister" in item) ? (
+                {/* {!("checkRegister" in item) ? (
                   <Button
                     variant="contained"
                     sx={{ bgcolor: "#1EAC4D" }}
@@ -193,15 +196,22 @@ const AccountPage = () => {
                   >
                     Deposit
                   </Button>
-                )}
+                )} */}
                 &nbsp;
+                <Button
+                    variant="contained"
+                    sx={{ bgcolor: "#287FD1" }}
+                    onClick={() => handleOpen(item)}
+                  >
+                    Deposit
+                  </Button>
               </StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>
       </Table>
       <Dialog open={openDialog} onClose={handleClose}>
-        <Deposit handleClose={handleClose} item={itemDeposit} />
+      <Deposit handleClose={handleClose} item={itemDeposit}/>
       </Dialog>
     </TableContainer>
   );

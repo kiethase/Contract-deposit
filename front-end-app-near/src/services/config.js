@@ -1,4 +1,8 @@
+// import * as nearAPI from "near-api-js";
+
+
 export const CONTRACT_NAME = process.env.CONTRACT_NAME || 'kei13.testnet' // || 'forbitswap.testnet'
+// const { connect, keyStores, WalletConnection } = nearAPI;
 
 export function getConfig(env) {
   switch (env) {
@@ -17,6 +21,7 @@ export function getConfig(env) {
     return {
       networkId: 'testnet',
       nodeUrl: 'https://rpc.testnet.near.org',
+      // keyStore: new keyStores.BrowserLocalStorageKeyStore(),
       contractName: CONTRACT_NAME,
       walletUrl: 'https://wallet.testnet.near.org',
       helperUrl: 'https://helper.testnet.near.org',
@@ -62,7 +67,7 @@ export function getConfig(env) {
 // Hard code Contract Token
 
 
-export const CONTRACT_TOKEN = 'usdt.fakes.testnet';
+export const CONTRACT_TOKEN = '';
 
 export function getConfigToken(env) {
   switch (env) {

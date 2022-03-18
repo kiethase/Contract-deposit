@@ -19,7 +19,7 @@ import { Link } from "react-router-dom";
 import Button from "@mui/material/Button";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 
-const HeaderComponent = () => {
+const HeaderComponent = (props) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -33,13 +33,13 @@ const HeaderComponent = () => {
   const [isLogin, setIsLogin] = React.useState(
     window.walletConnection.isSignedIn()
   );
-  const loginNearWallet = () => {
-    window.walletConnection.requestSignIn();
-  };
+  
 
   const logoutNearWallet = () => {
     window.walletConnection.signOut();
+
     setIsLogin(false);
+    props.setLoginState(false);
   };
 
   const handleProfileMenuOpen = (event) => {

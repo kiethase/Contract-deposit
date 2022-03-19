@@ -53,7 +53,7 @@ const DepositComponent = (props) => {
     // console.log(data.amount);
     await depositToken(data.amount, item.id);
      handleClose();
-     window.location.reload();
+    //  window.location.reload();
     // dispatch({ type: "LOADING", newLoading: !loading });
     
    
@@ -126,39 +126,7 @@ const DepositComponent = (props) => {
     return executeMultipleTransactions(transactions);
   };
 
-  const executeMultipleTransactions = async (transactions) => {
-    const nearTransactions = await Promise.all(
-      transactions.map(async (t, i) => {
-        let block = await window.near.connection.provider.block({
-          finality: "final",
-        });
-        let blockHash = baseDecode(block.header.hash);
-        return createTransaction(
-          window.accountId,
-          process.env.REACT_APP_PRIVATE_KEY,
-          t.receiverId,
-          i + 1,
-          t.functionCalls.map((fc) => {
-            return functionCall(fc.methodName, fc.args, fc.gas, fc.amount);
-          }),
-          blockHash
-        );
-      })
-    );
-    let actions = [];
-    nearTransactions.map((item) => {
-      actions.push(item.actions[0])
-      console.log(item.actions[0]);
-    });
-    const account = await window.near.account(window.accountId);
-    return account.signAndSendTransaction({
-      receiverId: nearTransactions[0].receiverId,
-      actions,
-    });
-    /*global event, fdescribe*/
-    /*eslint no-restricted-globals: ["error", "event", "fdescribe"]*/
-    
-  };
+  
 
   return (
     <>

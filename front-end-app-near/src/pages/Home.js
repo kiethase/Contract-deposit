@@ -58,7 +58,7 @@ const HomePage = (props) => {
   return (
     <div>
       {loginState ? (
-        checkRegis !== null ? (
+        // checkRegis !== null ? (
           <Button
             variant="contained"
             sx={{ bgcolor: "#287FD1" }}
@@ -67,15 +67,15 @@ const HomePage = (props) => {
           >
             View Account
           </Button>
-        ) : (
-          <Button
-            variant="contained"
-            sx={{ bgcolor: "#287FD1" }}
-            onClick={registerAccountToToken}
-          >
-            Register Account
-          </Button>
-        )
+        // ) : (
+        //   <Button
+        //     variant="contained"
+        //     sx={{ bgcolor: "#287FD1" }}
+        //     onClick={registerAccountToToken}
+        //   >
+        //     Register Account
+        //   </Button>
+        // )
       ) : (
         <Button
           variant="contained"

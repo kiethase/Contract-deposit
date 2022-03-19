@@ -22,8 +22,7 @@ const DepositComponent = (props) => {
   const config = getConfig("testnet");
   const accountInfor = JSON.parse(localStorage.getItem("undefined_wallet_auth_key"));
 
-  const key = accountInfor.allKeys[0];
-    console.log(accountInfor.allKeys[0]);
+
     // const ONE_YOCTO_NEAR = "0.000000000000000000000001";
   const decimals = item.decimals;
 
@@ -89,7 +88,17 @@ const DepositComponent = (props) => {
   // };
 
   const depositToken = async (amount, id) => {
+
     let transactions = [];
+
+    let storageBalanceOfGet = await window.walletConnection
+    .account()
+    .viewFunction(config.contractName, "storage_balance_of", {
+      account_id: accountInfor.accountId,
+    });
+
+    console.log(storageBalanceOfGet);
+
 
     transactions.unshift({
       receiverId: id,
@@ -118,6 +127,21 @@ const DepositComponent = (props) => {
               registration_only: true,
             },
             amount: "12500000000000000000000",
+            gas: "100000000000000",
+          },
+        ],
+      });
+    }
+    if (storageBalanceOfGet === null) {
+      transactions.unshift({
+        receiverId: config.contractName,
+        functionCalls: [
+          {
+            methodName: "storage_deposit",
+            args: {
+              registration_only: true,
+            },
+            amount: "100000000000000000000000",
             gas: "100000000000000",
           },
         ],

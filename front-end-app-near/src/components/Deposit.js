@@ -16,7 +16,7 @@ import { useStateValue } from "../common/StateProvider";
 
 
 const DepositComponent = (props) => {
-  const { item,setStatus } = props;
+  const { item } = props;
   // const [{ loading }, dispatch] = useStateValue();
 
   const config = getConfig("testnet");
@@ -160,7 +160,7 @@ const DepositComponent = (props) => {
         <DialogTitle>DEPOSIT TOKEN "{item.name}"</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Balance: {item.balanceWallet * 10 ** -item.decimals}
+            Balance in wallet: {item.balanceWallet * 10 ** -item.decimals}
           </DialogContentText>
           <TextField
             autoFocus

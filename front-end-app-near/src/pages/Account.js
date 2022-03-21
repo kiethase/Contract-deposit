@@ -10,6 +10,7 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Deposit from "../components/Deposit";
+import Withdraw from "../components/Withdraw";
 import { getConfig } from "../services/config";
 import { useStateValue } from "../common/StateProvider";
 
@@ -25,7 +26,9 @@ const AccountPage = () => {
   const config = getConfig("testnet");
   // Dialog control
   const [itemDeposit, setItemDeposit] = React.useState();
+  const [itemWithdraw, setItemWithdraw] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [openDialog2, setOpenDialog2] = React.useState(false);
 
   const handleOpen = (item) => {
     setItemDeposit(item);
@@ -33,6 +36,13 @@ const AccountPage = () => {
   };
   const handleClose = () => {
     setOpenDialog(false);
+  };
+  const handleOpen2 = (item) => {
+    setItemWithdraw(item);
+    setOpenDialog2(true);
+  };
+  const handleClose2 = () => {
+    setOpenDialog2(false);
   };
 
   //Register
@@ -180,30 +190,20 @@ const AccountPage = () => {
                 {item.decimals}
               </StyledTableCell>
               <StyledTableCell align="center">
-                {/* {!("checkRegister" in item) ? (
-                  <Button
+                <Button
                     variant="contained"
-                    sx={{ bgcolor: "#1EAC4D" }}
-                    onClick={() => handleRegisterExToToken(item.id)}
-                  >
-                    Register
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    sx={{ bgcolor: "#287FD1" }}
+                    sx={{ bgcolor: "#2E6EE6" }}
                     onClick={() => handleOpen(item)}
                   >
                     Deposit
                   </Button>
-                )} */}
                 &nbsp;
                 <Button
                     variant="contained"
-                    sx={{ bgcolor: "#287FD1" }}
-                    onClick={() => handleOpen(item)}
+                    sx={{ bgcolor: "#2E6EE6" }}
+                    onClick={() => handleOpen2(item)}
                   >
-                    Deposit
+                    Withdraw
                   </Button>
               </StyledTableCell>
             </StyledTableRow>
@@ -212,6 +212,9 @@ const AccountPage = () => {
       </Table>
       <Dialog open={openDialog} onClose={handleClose}>
       <Deposit handleClose={handleClose} item={itemDeposit}/>
+      </Dialog>
+      <Dialog open={openDialog2} onClose={handleClose2}>
+      <Withdraw handleClose2={handleClose2} item={itemWithdraw}/>
       </Dialog>
     </TableContainer>
   );

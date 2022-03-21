@@ -4,7 +4,7 @@ import {
   keyStores,
   utils,
   WalletConnection,
-  ConnectedWalletAccount
+  ConnectedWalletAccount,
 } from "near-api-js";
 import { getConfig, getConfigToken } from "./config";
 import { baseDecode } from "borsh";
@@ -66,68 +66,19 @@ export async function initContract() {
         "create_new_pool",
         "add_liquidity",
         "storage_deposit",
+        "withdraw",
       ],
     }
   );
 
-  //For contract token (deposit)
-  window.tokenContract = new Contract(
-    window.walletConnection.account(),
-    nearTokenConfig.contractName,
-    {
-      viewMethods: ["ft_total_supply", "ft_balance_of"],
-      changeMethods: ["ft_transfer", "ft_transfer_call", "storage_deposit"],
-    }
-  );
+
 }
 
-// export gas and amount for transaction
-// export const getGas = (gas) => Buffer.from(new BN("100000000000000"));
-
-// export const getAmount = (amount) =>
-//   amount ? Buffer.from(new BN("100000000000000")) : Buffer.from(new BN("0"));
-
-
-  export const getGas = (gas) =>
-  gas ? new BN(gas) : new BN('100000000000000');
+export const getGas = (gas) => (gas ? new BN(gas) : new BN("100000000000000"));
 export const getAmount = (amount) =>
-  amount ? new BN(utils.format.parseNearAmount(amount)) : new BN('0');
-// Thực  hiện  multipleTransaction  cho  token
-// Thực hiện tạo ra block cho transaction cho
-// Thực hiện hash block để  đưa lên web3 blockchain
+  amount ? new BN(utils.format.parseNearAmount(amount)) : new BN("0");
 
-// thực hiện theo
-// export const executeMultipleTransactions = async (
-//   transactions,
-// ) => {
-//   const { wallet, wallet_type } = getCurrentWallet();
-
-//   const currentTransactions = await Promise.all(
-//           transactions.map((t, i) => {
-//             return wallet.createTransaction({
-//               receiverId: t.receiverId,
-//               nonceOffset: i + 1,
-//               actions: t.functionCalls.map((fc) =>
-//                 functionCall(
-//                   fc.methodName,
-//                   fc.args,
-//                   getGas(fc.gas),
-//                   getAmount(fc.amount)
-//                 )
-//               ),
-//             });
-//           })
-//         );
-
-//   return wallet.requestSignTransactions(currentTransactions);
-// };
-
-const createTransactionConfig = async (
-  receiverId,
-  actions,
-  i
-) => {
-
+const createTransactionConfig = async (receiverId, actions, i) => {
   //ĐÂY LÀ CÁCH LẤY KEY DỰA TRÊN INMEMORY VÀ SỬ DỤNG SO SÁNH ACCESSKEY ĐỂ THỰC HIỆN KÍ NHẬN
   // const localKey = window.near.connection.signer.getPublicKey(
   //   window.accountId,
@@ -142,20 +93,24 @@ const createTransactionConfig = async (
   //   );
   // }
 
-  //ĐÂY LÀ CÁCH THỰC HIỆN LẤY  NHỮNG ACCESS KEY CÓ SẴN TRONG ACCOUNT TỪ ĐÓ NHỮNG 
+  //ĐÂY LÀ CÁCH THỰC HIỆN LẤY  NHỮNG ACCESS KEY CÓ SẴN TRONG ACCOUNT TỪ ĐÓ NHỮNG
   //ACCESS KEY NÀY SẼ LÀ ĐẠI DIỆN KÍ NHẬN CỦA ACCOUNT/TOKEN CHO CÁC TRANSACTION
   //CÁC ACCESS KEY NÀY CÓ THỂ GENERATE RA BAO NHIÊU TUỲ Ý VÀ CŨNG CÓ THỂ XEM LẠI
-  //ACCESS KEY NÀO DÙNG CHO GIAO DỊCH NÀO THÔNG QUA METHOD FINDACCESSKEY 
+  //ACCESS KEY NÀO DÙNG CHO GIAO DỊCH NÀO THÔNG QUA METHOD FINDACCESSKEY
   // const accountInforGet = await window.near.account(window.accountId);
-  const accountInfor = JSON.parse(localStorage.getItem("undefined_wallet_auth_key"));
+  const accountInfor = JSON.parse(
+    localStorage.getItem("undefined_wallet_auth_key")
+  );
 
   const accessKey = accountInfor.allKeys[0];
   // const accessKeys = await accountInforGet.getAccessKeys();
   // const accessKey = accessKeys[0].public_key;
-  const block = await window.near.connection.provider.block({ finality: "final" });
+  const block = await window.near.connection.provider.block({
+    finality: "final",
+  });
   const blockHash = baseDecode(block.header.hash);
   const publicKey = PublicKey.from(accessKey);
-  const nonce =  i + 1;
+  const nonce = i + 1;
   return createTransaction(
     window.accountId,
     publicKey,
@@ -173,7 +128,12 @@ export const executeMultipleTransactions = async (transactions) => {
       return createTransactionConfig(
         t.receiverId,
         t.functionCalls.map((fc) =>
-          functionCall(fc.methodName, fc.args, getGas(fc.gas), getAmount(fc.amount))
+          functionCall(
+            fc.methodName,
+            fc.args,
+            getGas(fc.gas),
+            getAmount(fc.amount)
+          )
         ),
         i
       );
@@ -181,7 +141,20 @@ export const executeMultipleTransactions = async (transactions) => {
   );
 
   return window.walletConnection.requestSignTransactions({
-     transactions: nearTransactions,
-   
+    transactions: nearTransactions,
   });
 };
+
+
+ export const withdrawCall = async (amountWithdraw,item) => {
+  
+    await window.contract.withdraw(
+      {
+        token_id: item.id,
+        amount: (amountWithdraw * 10 ** item.decimals).toString(),
+        
+      },
+      getGas("300000000000000"),
+      getAmount("0.000000000000000000000001"),
+    );
+  };

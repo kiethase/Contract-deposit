@@ -175,6 +175,8 @@ impl Contract {
     #[payable]
     pub fn withdraw (&mut self, token_id: ValidAccountId, amount: U128, unregister: Option<bool>) -> Promise {
         assert_one_yocto();
+        // Thực hiện xử lí các giá trị đc truyền vào và trong quá trình chạy chuẩn bị withdraw
+        
         let token_id: AccountId = token_id.into();
         let sender_id = env::predecessor_account_id();
         let mut account = self.internal_unwrap_account(&sender_id);

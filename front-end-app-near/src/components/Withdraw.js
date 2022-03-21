@@ -32,6 +32,7 @@ const WithdrawComponent = (props) => {
       amount: yup
         .number()
         .min(0, "Amount have to greater than zero")
+        .max(item.balanceInContract * 10 ** -item.decimals, "Amount have to lesser than balance in exchange")
         .typeError("Invalid amount")
         .required("Amount can't be blank!"),
     })

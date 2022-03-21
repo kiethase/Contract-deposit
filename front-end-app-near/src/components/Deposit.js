@@ -35,6 +35,7 @@ const DepositComponent = (props) => {
       amount: yup
         .number()
         .min(0, "Số lượng đặt phải lớn hơn 0")
+        .max(item.balanceWallet * 10 ** -item.decimals, "Amount have to lesser than balance in wallet")
         .typeError("Số lượng phải lớn hơn 0")
         .required("Số lượng đặt mua"),
     })

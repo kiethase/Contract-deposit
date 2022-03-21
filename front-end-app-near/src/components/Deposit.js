@@ -110,7 +110,7 @@ const DepositComponent = (props) => {
             amount: (10 ** decimals * amount).toString(),
             msg: "",
           },
-          amount: "1",
+          amount: "0.000000000000000000000001",
           gas: "100000000000000",
         },
       ],
@@ -126,12 +126,14 @@ const DepositComponent = (props) => {
               account_id: config.contractName,
               registration_only: true,
             },
-            amount: "12500000000000000000000",
+            amount: "0.0125",
             gas: "100000000000000",
           },
         ],
       });
     }
+    //12500000000000000000000
+    // 100000000000000
     if (storageBalanceOfGet === null) {
       transactions.unshift({
         receiverId: config.contractName,
@@ -139,9 +141,9 @@ const DepositComponent = (props) => {
           {
             methodName: "storage_deposit",
             args: {
-              registration_only: true,
+              // registration_only: true,
             },
-            amount: "100000000000000000000000",
+            amount: "0.1",
             gas: "100000000000000",
           },
         ],

@@ -87,6 +87,11 @@ export async function initContract() {
 // export const getAmount = (amount) =>
 //   amount ? Buffer.from(new BN("100000000000000")) : Buffer.from(new BN("0"));
 
+
+  export const getGas = (gas) =>
+  gas ? new BN(gas) : new BN('100000000000000');
+export const getAmount = (amount) =>
+  amount ? new BN(utils.format.parseNearAmount(amount)) : new BN('0');
 // Thực  hiện  multipleTransaction  cho  token
 // Thực hiện tạo ra block cho transaction cho
 // Thực hiện hash block để  đưa lên web3 blockchain
@@ -168,7 +173,7 @@ export const executeMultipleTransactions = async (transactions) => {
       return createTransactionConfig(
         t.receiverId,
         t.functionCalls.map((fc) =>
-          functionCall(fc.methodName, fc.args, fc.gas, fc.amount)
+          functionCall(fc.methodName, fc.args, getGas(fc.gas), getAmount(fc.amount))
         ),
         i
       );

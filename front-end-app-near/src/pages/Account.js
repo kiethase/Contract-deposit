@@ -10,11 +10,15 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Deposit from "../components/Deposit";
+import WrapNear from "../components/WrapToken";
 import Withdraw from "../components/Withdraw";
 import { getConfig } from "../services/config";
 import { useStateValue } from "../common/StateProvider";
-
-
+import Avatar from "@mui/material/Avatar";
+import Chip from "@mui/material/Chip";
+import nearIcon from "../assets/9d5c43cc-e232-4267-aa8a-8c654a55db2d-1608222929-b90bbe4696613e2faeb17d48ac3aa7ba6a83674a.png";
+import swapIcon from "../assets/Swap-Vector-Transparent.png";
+import wNearIcon from "../assets/racoon.png";
 const AccountPage = () => {
   const [result, setResult] = React.useState([]);
   // const [{ loading }, dispatch] = useStateValue();
@@ -26,9 +30,11 @@ const AccountPage = () => {
   const config = getConfig("testnet");
   // Dialog control
   const [itemDeposit, setItemDeposit] = React.useState();
+  const [nearBalance, setNearBalance] = React.useState();
   const [itemWithdraw, setItemWithdraw] = React.useState();
   const [openDialog, setOpenDialog] = React.useState(false);
   const [openDialog2, setOpenDialog2] = React.useState(false);
+  const [openSwapWrapNear, setOpenSwapWrapNear] = React.useState(false);
 
   const handleOpen = (item) => {
     setItemDeposit(item);
@@ -45,17 +51,23 @@ const AccountPage = () => {
     setOpenDialog2(false);
   };
 
+  const handleOpenWrap = () => {
+    setOpenSwapWrapNear(true);
+  };
+
+  const handleCloseWrap = () => {
+    setOpenSwapWrapNear(false);
+  };
+
   //Register
   const registerAccountToToken = async () => {
     await tokenContract.storage_deposit(
       {
-        account_id:  config.contractName,
+        account_id: config.contractName,
       },
       "300000000000000",
-      "12500000000000000000000",
-     
+      "12500000000000000000000"
     );
-  
   };
 
   const handleRegisterExToToken = async (id) => {
@@ -83,13 +95,17 @@ const AccountPage = () => {
     let obj = {};
     // Đây chúng ta lấy dữ liệu deposit gồm tokenID và amount
     let deposit_values = await contract.get_deposits({ account_id: accountId });
-    console.log(deposit_values);
     const tokens = await fetch(
       `${config.helperUrl}/account/${accountId}/likelyTokens`
     )
       .then((response) => response.json())
       .then((tokens) => tokens);
+    let balanceAccount = await window.walletConnection
+      .account()
+      .getAccountBalance();
 
+
+    setNearBalance(balanceAccount.available * 10 ** -24);
     for (let i of tokens) {
       let balanceOfTokenInWallet = await window.walletConnection
         .account()
@@ -105,7 +121,6 @@ const AccountPage = () => {
       let metadataToken = await window.walletConnection
         .account()
         .viewFunction(i, "ft_metadata");
-
       let storageBalanceOfGet = await window.walletConnection
         .account()
         .viewFunction(i, "storage_balance_of", {
@@ -131,7 +146,7 @@ const AccountPage = () => {
     }
   };
 
-  React.useEffect(async() => {
+  React.useEffect(async () => {
     await getBalanceOf();
   }, []);
 
@@ -154,69 +169,95 @@ const AccountPage = () => {
       border: 0,
     },
   }));
-
+ 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label="customized table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell>Stt</StyledTableCell>
-            <StyledTableCell>Token Name</StyledTableCell>
-            <StyledTableCell>Token ID</StyledTableCell>
-            <StyledTableCell align="center">Amount in wallet</StyledTableCell>
-            <StyledTableCell align="center">Amount in exchange</StyledTableCell>
-            <StyledTableCell align="center">Decimal</StyledTableCell>
-            <StyledTableCell align="center">--</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {result.map((item, index) => (
-            <StyledTableRow key={index}>
-              <StyledTableCell component="th" scope="row">
-                {index + 1}
-              </StyledTableCell>
-              <StyledTableCell>{item.name}</StyledTableCell>
-              <StyledTableCell>{item.id}</StyledTableCell>
-              <StyledTableCell align="center">
-                {item.balanceWallet  * (10 ** -item.decimals) }
-              </StyledTableCell>
+    <>
+      <Chip
+        onClick={handleOpenWrap}
+        avatar={<Avatar alt="Natacha" src={nearIcon} />}
+        color="primary"
+        label={<img src={swapIcon} width="15" height="10" />}
+        variant="outlined"
+        sx={{ margin: 5 }}
+        deleteIcon={
+          <img
+            alt="Natacha"
+            src={wNearIcon}
+            width="27"
+            height="27"
+            style={{ borderRadius: "50%" }}
+          />
+        }
+        onDelete={handleOpenWrap}
+      />
 
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell>Stt</StyledTableCell>
+              <StyledTableCell>Token Name</StyledTableCell>
+              <StyledTableCell>Token ID</StyledTableCell>
+              <StyledTableCell align="center">Amount in wallet</StyledTableCell>
               <StyledTableCell align="center">
-                {item.balanceInContract
-                  ? item.balanceInContract * (10 ** -item.decimals)
-                  : 0}
+                Amount in exchange
               </StyledTableCell>
-              <StyledTableCell align="center">
-                {item.decimals}
-              </StyledTableCell>
-              <StyledTableCell align="center">
-                <Button
+              <StyledTableCell align="center">Decimal</StyledTableCell>
+              <StyledTableCell align="center">--</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {result.map((item, index) => (
+              <StyledTableRow key={index}>
+                <StyledTableCell component="th" scope="row">
+                  {index + 1}
+                </StyledTableCell>
+                <StyledTableCell>{item.name}</StyledTableCell>
+                <StyledTableCell>{item.id}</StyledTableCell>
+                <StyledTableCell align="center">
+                  {item.balanceWallet * 10 ** -item.decimals}
+                </StyledTableCell>
+
+                <StyledTableCell align="center">
+                  {item.balanceInContract
+                    ? item.balanceInContract * 10 ** -item.decimals
+                    : 0}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {item.decimals}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  <Button
                     variant="contained"
                     sx={{ bgcolor: "#2E6EE6" }}
                     onClick={() => handleOpen(item)}
                   >
                     Deposit
                   </Button>
-                &nbsp;
-                <Button
+                  &nbsp;
+                  <Button
                     variant="contained"
                     sx={{ bgcolor: "#2E6EE6" }}
                     onClick={() => handleOpen2(item)}
                   >
                     Withdraw
                   </Button>
-              </StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <Dialog open={openDialog} onClose={handleClose}>
-      <Deposit handleClose={handleClose} item={itemDeposit}/>
-      </Dialog>
-      <Dialog open={openDialog2} onClose={handleClose2}>
-      <Withdraw handleClose2={handleClose2} item={itemWithdraw}/>
-      </Dialog>
-    </TableContainer>
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <Dialog open={openDialog} onClose={handleClose}>
+          <Deposit handleClose={handleClose} item={itemDeposit} />
+        </Dialog>
+        <Dialog open={openDialog2} onClose={handleClose2}>
+          <Withdraw handleClose2={handleClose2} item={itemWithdraw} />
+        </Dialog>
+        <Dialog open={openSwapWrapNear} onClose={handleCloseWrap}>
+          <WrapNear handleClose={handleCloseWrap} />
+        </Dialog>
+      </TableContainer>
+    </>
   );
 };
 

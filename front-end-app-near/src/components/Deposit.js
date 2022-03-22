@@ -61,32 +61,7 @@ const DepositComponent = (props) => {
 
   
 
-  // Thực hiện hàm ft_transfer_call
-  // const ftTransferCall = async (amountDeposit) => {
-  //   console.log(amountDeposit * 10 ** decimals);
-  //   await tokenContract.ft_transfer_call(
-  //     {
-  //       receiver_id: config.contractName,
-  //       amount: (amountDeposit * 10 ** decimals).toString(),
-  //       msg: "",
-  //     },
-  //     "300000000000000",
-  //     "1"
-  //   );
-  // };
 
-  /// REGISTER
-  // const registerAccountToToken = async (id) => {
-  //   await tokenContract.storage_deposit(
-  //     {
-  //       account_id:  config.contractName,
-  //     },
-  //     "300000000000000",
-  //     "12500000000000000000000",
-
-  //   );
-
-  // };
 
   const depositToken = async (amount, id) => {
 

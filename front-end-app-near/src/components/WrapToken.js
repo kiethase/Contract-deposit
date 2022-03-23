@@ -9,10 +9,22 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { getConfig } from "../services/config";
+import Divider from "@mui/material/Divider";
+import Chip from "@mui/material/Chip";
+import Fab from "@mui/material/Fab";
+import SwapVerticalCircleRoundedIcon from "@mui/icons-material/SwapVerticalCircleRounded";
+import { executeMultipleTransactions } from "../services/near";
 
 const WrapTokenNearComponent = (props) => {
   const { nearBalance } = props;
+  const [swapStatus, setSwapStatus] = React.useState(true);
+
+  const { WRAP_NEAR_CONTRACT_ID } = getConfig("testnet");
   const [balanceNearChange, setBalanceNearChange] = React.useState();
+  const accountInfor = JSON.parse(
+    localStorage.getItem("undefined_wallet_auth_key")
+  );
+  const config = getConfig("testnet");
 
   const handleChangeBalanceSubmit = (event) => {
     setBalanceNearChange(event.target.value);
@@ -27,7 +39,10 @@ const WrapTokenNearComponent = (props) => {
       balanceNearChange: yup
         .number()
         .min(0, "Số lượng đặt phải lớn hơn 0")
-        .max(nearBalance, "Amount have to lesser than balance near in wallet")
+        .max(
+          nearBalance.near,
+          "Amount have to lesser than balance near in wallet"
+        )
         .typeError("Invalid amount")
         .required("Amount can't be blank!"),
     })
@@ -40,22 +55,98 @@ const WrapTokenNearComponent = (props) => {
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
+
   const submitForm = async (data) => {
-    console.log(data.balanceNearChange);
-   
+    //   if(swapStatus){
+        await nearDeposit(data.balanceNearChange.toString());
+    //   }
+    //   else {
+    //       await nearWithdraw(data.balanceNearChange.toString());
+    //   }
+  
     handleClose();
     //  window.location.reload();
-   
+  };
+
+  const nearDeposit = async (amountIn) => {
+    let transactions = [];
+    let storageBalanceOfGet = await window.walletConnection
+      .account()
+      .viewFunction(config.contractName, "storage_balance_of", {
+        account_id: accountInfor.accountId,
+      });
+
+    // Thực hiện kiểm tra account đã đk zô contract chưa nếu chưa thì phải dk
+    // Mới thực hiện đc chuyển wNear
+    if (storageBalanceOfGet === null) {
+      transactions.unshift({
+        receiverId: config.contractName,
+        functionCalls: [
+          {
+            methodName: "storage_deposit",
+            args: {
+              // registration_only: true,
+            },
+            amount: "0.1",
+            gas: "100000000000000",
+          },
+        ],
+      });
+    }
+    // chúng ta thực hiện chuyển Near coin -> wNear token.
+    transactions.unshift({
+      receiverId: WRAP_NEAR_CONTRACT_ID,
+      functionCalls: [
+        {
+          methodName: "near_deposit",
+          args: {},
+          amount: amountIn,
+          gas: "50000000000000",
+        },
+      ],
+    });
+    return executeMultipleTransactions(transactions);
+  };
+
+  const nearWithdraw = async(amountOut) => {
+    let transactions = [];
+    transactions.unshift({
+        receiverId: WRAP_NEAR_CONTRACT_ID,
+        functionCalls:[
+            {
+                methodName: "near_withdraw",
+                args:{
+                    amount: amountOut,
+                },
+                amount: '0.000000000000000000000001',
+            }
+        ]
+    })
+    return executeMultipleTransactions(transactions);
+  }
+
+  const renderFieldNearAndWNear = (status) => {
+    if (status) {
+      return (
+        <DialogContentText>Near Balance: {nearBalance.near}</DialogContentText>
+      );
+    } else {
+      return (
+        <DialogContentText>
+          wNear Balance: {nearBalance.wNear}
+        </DialogContentText>
+      );
+    }
   };
   return (
     <>
       <form onSubmit={handleSubmit(submitForm)}>
         <DialogTitle>Wrap NEAR</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {/* Balance in wallet: {item.balanceWallet * 10 ** -item.decimals} */}
-            Near Balance: {nearBalance}
-          </DialogContentText>
+          {/* <DialogContentText>
+            Near Balance: {nearBalance.near}
+          </DialogContentText> */}
+          {renderFieldNearAndWNear(swapStatus)}
           <TextField
             autoFocus
             {...register("balanceNearChange")}
@@ -69,10 +160,18 @@ const WrapTokenNearComponent = (props) => {
             fullWidth
             onChange={handleChangeBalanceSubmit}
           />
-          <DialogContentText>
-            {/* Balance in wallet: {item.balanceWallet * 10 ** -item.decimals} */}
-            wNear Balance:
-          </DialogContentText>
+
+          <Divider sx={{ marginBottom: "20px", marginTop: "20px" }}>
+            <Fab
+              color="primary"
+              aria-label="swap"
+              onClick={() => setSwapStatus(!swapStatus)}
+            >
+              <SwapVerticalCircleRoundedIcon fontSize="large" />
+            </Fab>
+          </Divider>
+
+          {renderFieldNearAndWNear(!swapStatus)}
           <TextField
             autoFocus
             {...register("amount")}

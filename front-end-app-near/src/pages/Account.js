@@ -23,6 +23,7 @@ import wNearIcon from "../assets/Near_logo.png";
 import Stack from "@mui/material/Stack";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
+import { maxWidth } from "@mui/system";
 
 const AccountPage = () => {
   const [result, setResult] = React.useState([]);
@@ -66,17 +67,34 @@ const AccountPage = () => {
   const getBalanceOf = async () => {
     setResult([]);
     let obj = {};
+    let objNear = {};
     // Đây chúng ta lấy dữ liệu deposit gồm tokenID và amount
     let deposit_values = await contract.get_deposits({ account_id: accountId });
+    // Lấy nearBalance trong ví và wNear trong account gộp lại thành objNear
+    let balanceAccount = await window.walletConnection
+      .account()
+      .getAccountBalance();
+    let balanceWNear = await window.walletConnection
+      .account()
+      .viewFunction("wrap.testnet", "ft_balance_of", { account_id: accountId })
+      .catch((err) => {
+        return {
+          isFailed: true,
+        };
+      });
+      objNear = {
+          near: (balanceAccount.available * 10 ** -24).toFixed(5),
+          wNear: (balanceWNear * 10 ** -24).toFixed(5),
+      }
+    setNearBalance(objNear);
+
+    // Lấy các token trong account và thực hiẹne ghi nhận lại chuỗi obj vs các
+    // giá trị của token đó.
     const tokens = await fetch(
       `${config.helperUrl}/account/${accountId}/likelyTokens`
     )
       .then((response) => response.json())
       .then((tokens) => tokens);
-    let balanceAccount = await window.walletConnection
-      .account()
-      .getAccountBalance();
-    setNearBalance((balanceAccount.available * 10 ** -24).toFixed(5));
     for (let i of tokens) {
       let balanceOfTokenInWallet = await window.walletConnection
         .account()
@@ -140,7 +158,6 @@ const AccountPage = () => {
       border: 0,
     },
   }));
-
   return (
     <Stack
       direction="column"
@@ -163,7 +180,7 @@ const AccountPage = () => {
               deleteIcon={
                 <img
                   alt="Natacha"
-                  src={wNearIcon}
+                  src="https://i.postimg.cc/DZfHgngm/w-NEAR-no-border.png"
                   width="27"
                   height="27"
                   style={{ borderRadius: "50%" }}
@@ -172,7 +189,7 @@ const AccountPage = () => {
               onDelete={handleOpenWrap}
             />
           }
-          title={nearBalance + " NEAR"}
+          title={nearBalance? nearBalance.near + " NEAR" : ""}
         />
       </Card>
 
@@ -203,7 +220,7 @@ const AccountPage = () => {
                   {item.id === "wrap.testnet" ? (
                     <img
                       alt="Natacha"
-                      src={wNearIcon}
+                      src="https://i.postimg.cc/DZfHgngm/w-NEAR-no-border.png"
                       width="27"
                       height="27"
                       style={{ borderRadius: "50%" }}
@@ -249,7 +266,7 @@ const AccountPage = () => {
         <Dialog open={openDialog2} onClose={handleClose2}>
           <Withdraw handleClose2={handleClose2} item={itemWithdraw} />
         </Dialog>
-        <Dialog open={openSwapWrapNear} onClose={handleCloseWrap}>
+        <Dialog open={openSwapWrapNear} onClose={handleCloseWrap} maxWidth='sm' fullWidth>
           <WrapNear handleClose={handleCloseWrap} nearBalance={nearBalance} />
         </Dialog>
       </TableContainer>

@@ -51,7 +51,7 @@ const DepositComponent = (props) => {
   const submitForm = async (data) => {
     await depositToken(data.amount, item.id);
      handleClose();
-     window.location.reload();
+    //  window.location.reload();
   
     
    
@@ -71,7 +71,6 @@ const DepositComponent = (props) => {
       account_id: accountInfor.accountId,
     });
 
-    console.log(storageBalanceOfGet);
 
 
     transactions.unshift({
@@ -106,8 +105,7 @@ const DepositComponent = (props) => {
         ],
       });
     }
-    //12500000000000000000000
-    // 100000000000000
+
     if (storageBalanceOfGet === null) {
       transactions.unshift({
         receiverId: config.contractName,

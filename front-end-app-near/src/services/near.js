@@ -6,7 +6,7 @@ import {
   WalletConnection,
   ConnectedWalletAccount,
 } from "near-api-js";
-import { getConfig, getConfigToken } from "./config";
+import { getConfig } from "./config";
 import { baseDecode } from "borsh";
 import { BN } from "bn.js";
 // import Big Number for javascript
@@ -15,7 +15,6 @@ import { functionCall, createTransaction } from "near-api-js/lib/transaction";
 import { PublicKey } from "near-api-js/lib/utils";
 
 const nearConfig = getConfig(process.env.NODE_ENV || "development");
-const nearTokenConfig = getConfigToken(process.env.NODE_ENV || "development");
 
 // const path = require("path");
 // const homedir = require("os").homedir();

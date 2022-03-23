@@ -23,7 +23,6 @@ const DepositComponent = (props) => {
   const accountInfor = JSON.parse(localStorage.getItem("undefined_wallet_auth_key"));
 
 
-    // const ONE_YOCTO_NEAR = "0.000000000000000000000001";
   const decimals = item.decimals;
 
   const handleClose = () => {
@@ -36,8 +35,8 @@ const DepositComponent = (props) => {
         .number()
         .min(0, "Số lượng đặt phải lớn hơn 0")
         .max(item.balanceWallet * 10 ** -item.decimals, "Amount have to lesser than balance in wallet")
-        .typeError("Số lượng phải lớn hơn 0")
-        .required("Số lượng đặt mua"),
+        .typeError("Invalid amount")
+        .required("Amount can't be blank!"),
     })
     .required();
 
@@ -50,11 +49,10 @@ const DepositComponent = (props) => {
   });
 
   const submitForm = async (data) => {
-    // console.log(data.amount);
     await depositToken(data.amount, item.id);
      handleClose();
-    //  window.location.reload();
-    // dispatch({ type: "LOADING", newLoading: !loading });
+     window.location.reload();
+  
     
    
   };

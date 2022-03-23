@@ -11,7 +11,12 @@ import * as yup from "yup";
 import { getConfig } from "../services/config";
 
 const WrapTokenNearComponent = (props) => {
-  const { item } = props;
+  const { nearBalance } = props;
+  const [balanceNearChange, setBalanceNearChange] = React.useState();
+
+  const handleChangeBalanceSubmit = (event) => {
+    setBalanceNearChange(event.target.value);
+  };
 
   const handleClose = () => {
     props.handleClose();
@@ -19,15 +24,12 @@ const WrapTokenNearComponent = (props) => {
 
   const validationSchema = yup
     .object({
-      amount: yup
+      balanceNearChange: yup
         .number()
         .min(0, "Số lượng đặt phải lớn hơn 0")
-        // .max(
-        //   item.balanceWallet * 10 ** -item.decimals,
-        //   "Amount have to lesser than balance in wallet"
-        // )
-        .typeError("Số lượng phải lớn hơn 0")
-        .required("Số lượng đặt mua"),
+        .max(nearBalance, "Amount have to lesser than balance near in wallet")
+        .typeError("Invalid amount")
+        .required("Amount can't be blank!"),
     })
     .required();
 
@@ -39,11 +41,11 @@ const WrapTokenNearComponent = (props) => {
     resolver: yupResolver(validationSchema),
   });
   const submitForm = async (data) => {
-    // console.log(data.amount);
-    // await depositToken(data.amount, item.id);
+    console.log(data.balanceNearChange);
+   
     handleClose();
     //  window.location.reload();
-    // dispatch({ type: "LOADING", newLoading: !loading });
+   
   };
   return (
     <>
@@ -52,7 +54,24 @@ const WrapTokenNearComponent = (props) => {
         <DialogContent>
           <DialogContentText>
             {/* Balance in wallet: {item.balanceWallet * 10 ** -item.decimals} */}
-            Balance
+            Near Balance: {nearBalance}
+          </DialogContentText>
+          <TextField
+            autoFocus
+            {...register("balanceNearChange")}
+            error={errors.balanceNearChange != null}
+            helperText={errors.balanceNearChange?.message}
+            label="Amount"
+            margin="dense"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            fullWidth
+            onChange={handleChangeBalanceSubmit}
+          />
+          <DialogContentText>
+            {/* Balance in wallet: {item.balanceWallet * 10 ** -item.decimals} */}
+            wNear Balance:
           </DialogContentText>
           <TextField
             autoFocus
@@ -65,12 +84,14 @@ const WrapTokenNearComponent = (props) => {
               shrink: true,
             }}
             fullWidth
-            type="number"
+            disabled
+            readOnly
+            value={balanceNearChange}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Deposit</Button>
+          <Button type="submit">Submit</Button>
         </DialogActions>
       </form>
     </>

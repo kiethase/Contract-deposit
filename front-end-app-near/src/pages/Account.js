@@ -18,14 +18,17 @@ import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import nearIcon from "../assets/9d5c43cc-e232-4267-aa8a-8c654a55db2d-1608222929-b90bbe4696613e2faeb17d48ac3aa7ba6a83674a.png";
 import swapIcon from "../assets/Swap-Vector-Transparent.png";
-import wNearIcon from "../assets/racoon.png";
+
+import wNearIcon from "../assets/Near_logo.png";
+import Stack from "@mui/material/Stack";
+import Card from "@mui/material/Card";
+import CardHeader from "@mui/material/CardHeader";
+
 const AccountPage = () => {
   const [result, setResult] = React.useState([]);
-  // const [{ loading }, dispatch] = useStateValue();
 
   const contract = window.contract;
   const accountId = window.accountId;
-  const tokenContract = window.tokenContract;
 
   const config = getConfig("testnet");
   // Dialog control
@@ -59,36 +62,6 @@ const AccountPage = () => {
     setOpenSwapWrapNear(false);
   };
 
-  //Register
-  const registerAccountToToken = async () => {
-    await tokenContract.storage_deposit(
-      {
-        account_id: config.contractName,
-      },
-      "300000000000000",
-      "12500000000000000000000"
-    );
-  };
-
-  const handleRegisterExToToken = async (id) => {
-    let transactions = [];
-
-    transactions.unshift({
-      receiverId: id,
-      functionCalls: [
-        {
-          methodName: "storage_deposit",
-          args: {
-            account_id: config.contractName,
-          },
-          amount: "1",
-          gas: "100000000000000",
-        },
-      ],
-    });
-    await registerAccountToToken();
-  };
-
   // "ft_balance_of"
   const getBalanceOf = async () => {
     setResult([]);
@@ -103,9 +76,7 @@ const AccountPage = () => {
     let balanceAccount = await window.walletConnection
       .account()
       .getAccountBalance();
-
-
-    setNearBalance(balanceAccount.available * 10 ** -24);
+    setNearBalance((balanceAccount.available * 10 ** -24).toFixed(5));
     for (let i of tokens) {
       let balanceOfTokenInWallet = await window.walletConnection
         .account()
@@ -169,27 +140,41 @@ const AccountPage = () => {
       border: 0,
     },
   }));
- 
+
   return (
-    <>
-      <Chip
-        onClick={handleOpenWrap}
-        avatar={<Avatar alt="Natacha" src={nearIcon} />}
-        color="primary"
-        label={<img src={swapIcon} width="15" height="10" />}
-        variant="outlined"
-        sx={{ margin: 5 }}
-        deleteIcon={
-          <img
-            alt="Natacha"
-            src={wNearIcon}
-            width="27"
-            height="27"
-            style={{ borderRadius: "50%" }}
-          />
-        }
-        onDelete={handleOpenWrap}
-      />
+    <Stack
+      direction="column"
+      justifyContent="flex-start"
+      alignItems="center"
+      spacing={2}
+    >
+      <Card>
+        <CardHeader
+          avatar={<Avatar alt="Remy Sharp" src={nearIcon} mr={5} />}
+          titleTypographyProps={{ variant: "h6" }}
+          action={
+            <Chip
+              onClick={handleOpenWrap}
+              avatar={<Avatar alt="Natacha" src={nearIcon} />}
+              color="primary"
+              label={<img src={swapIcon} width="15" height="10" />}
+              variant="outlined"
+              sx={{ margin: 5 }}
+              deleteIcon={
+                <img
+                  alt="Natacha"
+                  src={wNearIcon}
+                  width="27"
+                  height="27"
+                  style={{ borderRadius: "50%" }}
+                />
+              }
+              onDelete={handleOpenWrap}
+            />
+          }
+          title={nearBalance + " NEAR"}
+        />
+      </Card>
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -213,7 +198,18 @@ const AccountPage = () => {
                   {index + 1}
                 </StyledTableCell>
                 <StyledTableCell>{item.name}</StyledTableCell>
-                <StyledTableCell>{item.id}</StyledTableCell>
+                <StyledTableCell>
+                  {item.id}{" "}
+                  {item.id === "wrap.testnet" ? (
+                    <img
+                      alt="Natacha"
+                      src={wNearIcon}
+                      width="27"
+                      height="27"
+                      style={{ borderRadius: "50%" }}
+                    />
+                  ) : null}
+                </StyledTableCell>
                 <StyledTableCell align="center">
                   {item.balanceWallet * 10 ** -item.decimals}
                 </StyledTableCell>
@@ -254,10 +250,10 @@ const AccountPage = () => {
           <Withdraw handleClose2={handleClose2} item={itemWithdraw} />
         </Dialog>
         <Dialog open={openSwapWrapNear} onClose={handleCloseWrap}>
-          <WrapNear handleClose={handleCloseWrap} />
+          <WrapNear handleClose={handleCloseWrap} nearBalance={nearBalance} />
         </Dialog>
       </TableContainer>
-    </>
+    </Stack>
   );
 };
 

@@ -14,12 +14,14 @@ import Chip from "@mui/material/Chip";
 import Fab from "@mui/material/Fab";
 import SwapVerticalCircleRoundedIcon from "@mui/icons-material/SwapVerticalCircleRounded";
 import { executeMultipleTransactions } from "../services/near";
+import { utils } from 'near-api-js';
 
+
+export const { WRAP_NEAR_CONTRACT_ID } = getConfig("testnet");
 const WrapTokenNearComponent = (props) => {
   const { nearBalance } = props;
   const [swapStatus, setSwapStatus] = React.useState(true);
 
-  const { WRAP_NEAR_CONTRACT_ID } = getConfig("testnet");
   const [balanceNearChange, setBalanceNearChange] = React.useState();
   const accountInfor = JSON.parse(
     localStorage.getItem("undefined_wallet_auth_key")
@@ -57,13 +59,12 @@ const WrapTokenNearComponent = (props) => {
   });
 
   const submitForm = async (data) => {
-    //   if(swapStatus){
-        await nearDeposit(data.balanceNearChange.toString());
-    //   }
-    //   else {
-    //       await nearWithdraw(data.balanceNearChange.toString());
-    //   }
-  
+    if (swapStatus) {
+      await nearDeposit(data.balanceNearChange.toString());
+    } else {
+      await nearWithdraw(data.balanceNearChange.toString());
+    }
+
     handleClose();
     //  window.location.reload();
   };
@@ -72,7 +73,7 @@ const WrapTokenNearComponent = (props) => {
     let transactions = [];
     let storageBalanceOfGet = await window.walletConnection
       .account()
-      .viewFunction(config.contractName, "storage_balance_of", {
+      .viewFunction(WRAP_NEAR_CONTRACT_ID, "storage_balance_of", {
         account_id: accountInfor.accountId,
       });
 
@@ -80,7 +81,7 @@ const WrapTokenNearComponent = (props) => {
     // Mới thực hiện đc chuyển wNear
     if (storageBalanceOfGet === null) {
       transactions.unshift({
-        receiverId: config.contractName,
+        receiverId: WRAP_NEAR_CONTRACT_ID,
         functionCalls: [
           {
             methodName: "storage_deposit",
@@ -108,22 +109,47 @@ const WrapTokenNearComponent = (props) => {
     return executeMultipleTransactions(transactions);
   };
 
-  const nearWithdraw = async(amountOut) => {
+  const nearWithdraw = async (amountOut) => {
     let transactions = [];
-    transactions.unshift({
+    let storageBalanceOfGet = await window.walletConnection
+      .account()
+      .viewFunction(WRAP_NEAR_CONTRACT_ID, "storage_balance_of", {
+        account_id: accountInfor.accountId,
+      });
+
+    // Thực hiện kiểm tra account đã đk zô contract chưa nếu chưa thì phải dk
+    // Mới thực hiện đc chuyển wNear
+    if (storageBalanceOfGet === null) {
+      transactions.unshift({
         receiverId: WRAP_NEAR_CONTRACT_ID,
-        functionCalls:[
-            {
-                methodName: "near_withdraw",
-                args:{
-                    amount: amountOut,
-                },
-                amount: '0.000000000000000000000001',
-            }
-        ]
-    })
+        functionCalls: [
+          {
+            methodName: "storage_deposit",
+            args: {
+              // registration_only: true,
+            },
+            amount: "0.1",
+            gas: "100000000000000",
+          },
+        ],
+      });
+    }
+    transactions.unshift({
+      receiverId: WRAP_NEAR_CONTRACT_ID,
+      functionCalls: [
+        {
+          methodName: "near_withdraw",
+          args: {
+              // Chú ý phải chuyển đổi amount wNear thành amount Near mới có thể thực hiện chuyển đổi
+              // Và phải đảm bảo account đk vào contract và đưa phí 1 YOCTO NEAR
+            amount:   utils.format.parseNearAmount(amountOut),
+          },
+          amount: "0.000000000000000000000001",
+        },
+      ],
+    });
     return executeMultipleTransactions(transactions);
-  }
+  };
 
   const renderFieldNearAndWNear = (status) => {
     if (status) {

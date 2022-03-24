@@ -122,6 +122,7 @@ const createTransactionConfig = async (receiverId, actions, i) => {
 
 // Thực hiện theo phương pháp requestSignTransactions
 export const executeMultipleTransactions = async (transactions) => {
+  // console.log(transactions);
   const nearTransactions = await Promise.all(
     transactions.map(async (t, i) => {
       return createTransactionConfig(

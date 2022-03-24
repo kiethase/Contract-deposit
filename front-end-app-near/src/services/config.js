@@ -26,7 +26,7 @@ export function getConfig(env) {
       walletUrl: 'https://wallet.testnet.near.org',
       helperUrl: 'https://helper.testnet.near.org',
       explorerUrl: 'https://explorer.testnet.near.org',
-      // WRAP_NEAR_CONTRACT_ID: process.env.WRAP_NEAR_CONTRACT_ID || 'wrap.testnet',
+      WRAP_NEAR_CONTRACT_ID: process.env.WRAP_NEAR_CONTRACT_ID || 'wrap.testnet',
     }
   case 'betanet':
     return {

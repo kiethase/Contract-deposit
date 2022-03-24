@@ -19,7 +19,7 @@ import Chip from "@mui/material/Chip";
 import nearIcon from "../assets/9d5c43cc-e232-4267-aa8a-8c654a55db2d-1608222929-b90bbe4696613e2faeb17d48ac3aa7ba6a83674a.png";
 import swapIcon from "../assets/Swap-Vector-Transparent.png";
 
-import wNearIcon from "../assets/Near_logo.png";
+import wNearIcon from "../assets/racoon.png";
 import Stack from "@mui/material/Stack";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -180,6 +180,7 @@ const AccountPage = () => {
               deleteIcon={
                 <img
                   alt="Natacha"
+                //   src={wNearIcon}
                   src="https://i.postimg.cc/DZfHgngm/w-NEAR-no-border.png"
                   width="27"
                   height="27"

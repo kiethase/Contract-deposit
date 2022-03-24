@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/Home";
 import AccountPage from "./pages/Account";
+import PoolsPage from "./pages/Pools";
 import styled from 'styled-components'
 import Header from "./components/Header/Header";
 import * as React from "react";
@@ -44,6 +45,7 @@ function App() {
       <BodyWrapper>
         <Routes>
           <Route exact path="/account" element={<AccountPage loginState={loginState}/>}/>
+          <Route exact path="/pools" element={<PoolsPage loginState={loginState}/>}/>
           <Route exact path="/" element={<HomePage loginState={loginState}/>}/>
         </Routes>
       </BodyWrapper>

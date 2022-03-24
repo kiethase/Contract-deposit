@@ -17,7 +17,11 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import { Link } from "react-router-dom";
 import Button from "@mui/material/Button";
-import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import Divider from "@mui/material/Divider";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import PoolIcon from '@mui/icons-material/Pool';
 
 const HeaderComponent = (props) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -28,12 +32,13 @@ const HeaderComponent = (props) => {
   const menuId = "primary-search-account-menu";
   const mobileMenuId = "primary-search-account-menu-mobile";
 
-  const accountId = JSON.parse(localStorage.getItem("undefined_wallet_auth_key"));
+  const accountId = JSON.parse(
+    localStorage.getItem("undefined_wallet_auth_key")
+  );
 
   const [isLogin, setIsLogin] = React.useState(
     window.walletConnection.isSignedIn()
   );
-  
 
   const logoutNearWallet = () => {
     window.walletConnection.signOut();
@@ -79,58 +84,17 @@ const HeaderComponent = (props) => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
+      <MenuItem component={Link} to="/account" divider>
+        <AssessmentIcon />
+        &nbsp; Detail
+      </MenuItem>
+      <MenuItem component={Link} to="/pools" divider>
+        <PoolIcon />
+        &nbsp; Pools
+      </MenuItem>
+
       <MenuItem onClick={handleLogoutWallet} component={Link} to="/">
         Logout
-      </MenuItem>
-    </Menu>
-  );
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Logout</p>
       </MenuItem>
     </Menu>
   );
@@ -145,7 +109,7 @@ const HeaderComponent = (props) => {
             component="div"
             sx={{ display: { xs: "none", sm: "block" } }}
           >
-            {accountId? accountId.accountId : (<p>NEAR</p>)}
+            {accountId ? accountId.accountId : <p>NEAR</p>}
           </Typography>
 
           <Box sx={{ flexGrow: 1 }} />

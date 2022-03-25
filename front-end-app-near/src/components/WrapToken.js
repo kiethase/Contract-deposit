@@ -14,8 +14,7 @@ import Chip from "@mui/material/Chip";
 import Fab from "@mui/material/Fab";
 import SwapVerticalCircleRoundedIcon from "@mui/icons-material/SwapVerticalCircleRounded";
 import { executeMultipleTransactions } from "../services/near";
-import { utils } from 'near-api-js';
-
+import { utils } from "near-api-js";
 
 export const { WRAP_NEAR_CONTRACT_ID } = getConfig("testnet");
 const WrapTokenNearComponent = (props) => {
@@ -71,15 +70,18 @@ const WrapTokenNearComponent = (props) => {
 
   const nearDeposit = async (amountIn) => {
     let transactions = [];
+    console.log(WRAP_NEAR_CONTRACT_ID);
     let storageBalanceOfGet = await window.walletConnection
       .account()
       .viewFunction(WRAP_NEAR_CONTRACT_ID, "storage_balance_of", {
         account_id: accountInfor.accountId,
       });
 
+    console.log(storageBalanceOfGet);
+
     // Thực hiện kiểm tra account đã đk zô contract chưa nếu chưa thì phải dk
     // Mới thực hiện đc chuyển wNear
-    if (storageBalanceOfGet === null) {
+    if (!storageBalanceOfGet || storageBalanceOfGet.total === "0") {
       transactions.unshift({
         receiverId: WRAP_NEAR_CONTRACT_ID,
         functionCalls: [
@@ -88,11 +90,27 @@ const WrapTokenNearComponent = (props) => {
             args: {
               // registration_only: true,
             },
-            amount: "0.1",
-            gas: "100000000000000",
+            amount: "0.00125",
+            gas: "30000000000000",
           },
         ],
       });
+      // } else if (storageBalanceOfGet !== null){
+      //   if (storageBalanceOfGet.total === '0') {
+      //     transactions.unshift({
+      //       receiverId: WRAP_NEAR_CONTRACT_ID,
+      //       functionCalls: [
+      //         {
+      //           methodName: "storage_deposit",
+      //           args: {
+      //             // registration_only: true,
+      //           },
+      //           amount: "0.00125",
+      //           gas: "30000000000000",
+      //         },
+      //       ],
+      //     });
+      //   }
     }
     // chúng ta thực hiện chuyển Near coin -> wNear token.
     transactions.unshift({
@@ -119,7 +137,7 @@ const WrapTokenNearComponent = (props) => {
 
     // Thực hiện kiểm tra account đã đk zô contract chưa nếu chưa thì phải dk
     // Mới thực hiện đc chuyển wNear
-    if (storageBalanceOfGet === null) {
+    if (!storageBalanceOfGet || storageBalanceOfGet.total === "0") {
       transactions.unshift({
         receiverId: WRAP_NEAR_CONTRACT_ID,
         functionCalls: [
@@ -128,8 +146,8 @@ const WrapTokenNearComponent = (props) => {
             args: {
               // registration_only: true,
             },
-            amount: "0.1",
-            gas: "100000000000000",
+            amount: "0.00125",
+            gas: "30000000000000",
           },
         ],
       });
@@ -140,9 +158,9 @@ const WrapTokenNearComponent = (props) => {
         {
           methodName: "near_withdraw",
           args: {
-              // Chú ý phải chuyển đổi amount wNear thành amount Near mới có thể thực hiện chuyển đổi
-              // Và phải đảm bảo account đk vào contract và đưa phí 1 YOCTO NEAR
-            amount:   utils.format.parseNearAmount(amountOut),
+            // Chú ý phải chuyển đổi amount wNear thành amount Near mới có thể thực hiện chuyển đổi
+            // Và phải đảm bảo account đk vào contract và đưa phí 1 YOCTO NEAR
+            amount: utils.format.parseNearAmount(amountOut),
           },
           amount: "0.000000000000000000000001",
         },

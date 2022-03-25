@@ -72,7 +72,6 @@ const DepositComponent = (props) => {
     });
 
 
-
     transactions.unshift({
       receiverId: id,
       functionCalls: [
@@ -97,7 +96,7 @@ const DepositComponent = (props) => {
             methodName: "storage_deposit",
             args: {
               account_id: config.contractName,
-              registration_only: true,
+              // registration_only: true,
             },
             amount: "0.0125",
             gas: "100000000000000",
@@ -120,6 +119,23 @@ const DepositComponent = (props) => {
           },
         ],
       });
+    } 
+    else if(storageBalanceOfGet !== null){
+      if (parseInt(storageBalanceOfGet.total) < 1000000000000000000000) {
+        transactions.unshift({
+          receiverId: config.contractName,
+          functionCalls: [
+            {
+              methodName: "storage_deposit",
+              args: {
+                // registration_only: true,
+              },
+              amount: "0.1",
+              gas: "100000000000000",
+            },
+          ],
+        });
+      }
     }
     return executeMultipleTransactions(transactions);
   };
